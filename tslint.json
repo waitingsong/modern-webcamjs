@@ -1,0 +1,108 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint-eslint-rules"
+    ],
+    "jsRules": {},
+    "rules": {
+      "linebreak-style": [true , "LF" ],
+      "no-extra-semi": true,
+      "semicolon": [ true, "always", "ignore-bound-class-methods" ],
+      "quotemark": [ true, "single" ],
+
+      "no-unused-variable": false,
+      "indent": [true, "space", 4],
+      // "indent": [1, 4, {"SwitchCase": 1,  "VariableDeclarator": { "var": 1, "let": 1, "const": 1}, "outerIIFEBody": 1 }],	// 强制使用一致的缩进
+      "no-use-before-declare": true,  // 禁止在变量定义之前使用它们
+
+      // "dot-notation": 1,	// 强制尽可能地使用点号
+      // "no-floating-decimal": 1,	// 禁止数字字面量中使用前导和末尾小数点
+      "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],	// 当最后一个元素或属性与闭括号 ] 或 右大括号 在 不同的行时，要求使用拖尾逗号；当在 同一行时，禁止使用拖尾逗号
+
+      "brace-style": [true, "stroustrup", { "allowSingleLine": true }],	// 大括号风格要求 
+      "curly": true,	// 要求遵循大括号约定 
+      "object-curly-spacing": [true, "never"],	// 强制在大括号中使用一致的空格
+
+      // "comma-spacing": [1, { "before": false, "after": true }],	// 强制在逗号周围使用空格 禁止逗号前出现空格,强制逗号后空格
+      "no-multi-spaces": [ true, { "exceptions": { "PropertyAssignment": true, "VariableDeclaration": false } } ] ,	// 禁止出现多个空格
+
+      // "space-before-function-paren": [1, "never"],	// 禁止函数圆括号之前有一个空格
+      // "space-infix-ops": [2, {"int32Hint": true}],	// 要求中缀操作符周围有空格
+      // "no-whitespace-before-property": [1],	// 禁止属性前有空白
+
+      "array-bracket-spacing": [true, "never", {"singleValue": false, "objectsInArrays": true, "arraysInArrays": true} ],	// 设置在括号内使用空格风格
+
+      // "no-unsafe-negation": 1,	// disallow negating the left operand of relational operators 
+      // "yoda": 2,	// 禁止Yoda条件
+
+      "ter-func-call-spacing": [true, "never"],	// disallow spacing between function identifiers and their invocations
+
+      // "space-before-blocks": [1, "always"],	// 强制在块之前使用一致的空格
+      // "key-spacing": [1, {"beforeColon": false, "afterColon": true, "mode": "minimum", "align": "value" }],	// 强制在对象字面量的键和值之间使用一致的空格 
+      // "keyword-spacing": [1, {"before": true, "after": true}],	// 强制在对象字面量的键和值之间使用一致的空格 
+      "ter-arrow-spacing": [true, { "before": true, "after": true }],	// 要求箭头函数的箭头之前或之后有空格
+      "block-spacing": [true, "always"],	// 强制在单行代码块中使用一致的空格
+
+      // "space-unary-ops": [
+      //   1, {
+      //     "words": true,
+      //     "nonwords": false,
+      //     "overrides": {
+      //       "!": true,
+      //       "!!": true
+      //     }
+      //   }
+      // ],
+
+      // "newline-after-var": [1, "always"],	// 要求变量声明语句后有一行空行 
+      "no-consecutive-blank-lines": [true, 4],	// 多个空行控制
+
+      "no-trailing-whitespace": true,	// 禁用行尾空白 
+      "eofline": true,
+      // "unicode-bom": [2, "never"],    // 禁止使用 Unicode 字节顺序标记 (BOM)
+
+      "triple-equals": true,
+      "forin": true,
+      "no-eval": true,
+      // "no-implied-eval": 2,	// 禁止使用类似 eval() 的方法
+      // "no-eq-null": 2,	// 禁止在没有类型检查操作符的情况下与 null 进行比较
+      // "no-with": 2,
+      "no-construct": true,	// 禁止对 String，Number 和 Boolean 使用 new 操作符
+      // "no-useless-escape": 2,	// 禁用不必要的转义字符
+      "no-new-object": true,	// 禁止使用 Object 构造函数 new Object, 使用{}替代
+      // "prefer-numeric-literals": 2,	// parseInt只处理十进制
+      // "wrap-regex": 2,	// 要求正则表达式被括号包裹起来
+      // "no-undef-init": 2,	// 不允许初始化变量值为 undefined
+      // "wrap-iife": [1, "any"],	// 需要把立即执行的函数包裹起来
+      // "no-delete-var": 2,	// 禁止删除变量
+      // "no-label-var": 2,	// 禁用与变量同名的标签
+      "no-empty": false,  // 禁止空块语句
+      "no-var-keyword": true,  // 要求使用 let 或 const 而不是 var
+
+      "ter-no-irregular-whitespace": true, // 禁止不规则的空白
+      "valid-typeof": true,  // 强制 typeof 表达式与有效的字符串进行比较 
+      "spaced-comment": [true, "check-space", {"ignore-words": ["-", "+"]}],  // 强制在注释中 // 或 /* 使用一致的空格 
+      "use-isnan": true, // 要求使用 isNaN() 检查 NaN
+
+      "no-arg": true,
+      // "no-extra-bind": 1,
+      // "no-loop-func": 1,
+      // "no-new-func": 2,
+      // "no-octal-escape": 2,
+      // "no-return-assign": 2,
+      // "no-return-await": 2,
+      // "no-self-compare": 2,
+      // "no-sequences": 2,
+      "no-string-throw": true,
+      // "no-unmodified-loop-condition": 2,
+      // "no-array-constructor": 2,
+      // "no-tabs": 0,
+      // "no-confusing-arrow": 2,
+      // "no-duplicate-imports": 2,
+      // "no-useless-computed-key": 2,
+      // "no-useless-constructor": 2,
+      // "no-useless-rename": 2,
+      "no-console": [false]
+    },
+    "rulesDirectory": []
+}

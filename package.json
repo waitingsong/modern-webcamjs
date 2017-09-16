@@ -1,0 +1,36 @@
+{
+  "name": "modern-webcam",
+  "version": "1.0.0",
+  "description": "HTML5 Webcam Image Capture Library",
+  "main": "./dist/webcam.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build",
+    "build": "rm -rf dist/* && tsc -p ./ --outDir dist/",
+    "tsc:w": "tsc -p ./tsconfig.json -w"
+  },
+  "keywords": [
+    "camera",
+    "html5",
+    "getusermedia"
+  ],
+  "module": "./dist/webcam.js",
+  "types": "./dist/webcam.d.ts",
+  "author": "waiting",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waitingsong/modern-webcam.git"
+  },
+  "bugs": {
+    "url": "https://github.com/waitingsong/modern-webcam/issues"
+  },
+  "homepage": "https://github.com/waitingsong/modern-webcam#readme",
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "^2.5.2"
+  }
+}
