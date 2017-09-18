@@ -5,7 +5,6 @@
  */
 
 
-let _: boolean = false;    // browser supported
 let modInited: boolean = false;     // module initialized
 let mediaDevices: MediaDevices;
 const devList: MediaDeviceInfo[] = [];   // available device
