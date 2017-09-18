@@ -94,6 +94,7 @@ const init = <Init> function(config): Inst {
         inst.streamMap = new Map();
         inst.streamConfigMap = new Map();
         inst.currStreamIdx = -1;
+        inst.retryCount = 0;
         cam.guid++;
 
         if (inst.config.ctx) {
@@ -478,6 +479,23 @@ init.fn.stop_media = function(sidx) {
 
 init.fn.snap = function(opts) {
     const inst = this;
+
+    if (inst.retryCount > 20) { // @HARDCODED
+        inst.retryCount = 0;
+        return Promise.resolve('');
+    }
+
+    // instance or video not ready
+    if ( ! inst.inited || ! inst.live) {
+        return new Promise(resolve => {
+            inst.retryCount += 1;
+            setTimeout(resolve, 1500, {inst, opts});
+        })
+        .then(({inst, opts}) => {
+            return (<Inst>inst).snap(opts);
+        });
+    }
+
     const sopts = inst.prepare_snap_opts(opts); // snap opts
 
     if ( ! sopts || Number.isNaN(+sopts.streamIdx)) {
@@ -863,6 +881,7 @@ export interface Inst extends InitFn {
     inited: boolean;
     live: boolean;
     currStreamIdx: number;
+    retryCount: number;
 }
 
 
