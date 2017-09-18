@@ -478,8 +478,16 @@ init.fn.snap = function(opts) {
         console.error('stream not lived');
         return Promise.resolve('');
     }
+    if (sopts.streamIdx === inst.currStreamIdx) {
+        return snap(inst, sopts);
+    }
+    else {
+        return inst.connect(sopts.streamIdx)
+            .then(() => {
+                return snap(inst, sopts);
+            });
+    }
 
-    return snap(inst, sopts);
 };
 
 
