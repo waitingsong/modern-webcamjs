@@ -18,6 +18,8 @@ const devList: MediaDeviceInfo[] = [];   // available device
  */
 let labelList: string[][] = [];
 
+// device detect
+const pms = init_mod();
 
 
 interface cam {
@@ -219,7 +221,6 @@ function init_mod(): Promise<boolean> {
     })
     .catch(handleError);
 }
-const pms = init_mod();
 
 
 function handleError(err) {
