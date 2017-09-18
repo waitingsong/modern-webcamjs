@@ -2,6 +2,8 @@
  * Modern-Webcam
  *
  * @author waiting
+ * @license MIT
+ * @link https://github.com/waitingsong/modern-webcam
  */
 
 
