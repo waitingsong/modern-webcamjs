@@ -525,7 +525,6 @@ init.fn.snap = function(opts) {
                 return inst.snap(sopts);
             });
     }
-
 };
 
 
