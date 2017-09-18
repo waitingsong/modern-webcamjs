@@ -44,6 +44,8 @@ const cam: cam = {
         imageFormat:  'jpeg',
         jpegQuality:  95,
         dataType:   'dataURL',
+        switchDelay: 1500,  // msec. waiting time for vedio ready to snap() when camera switching needed. no switching no snap delay
+        snapDelay: 0,        // msec. waiting time before snap()
     },
     streamConfig: <StreamConfig> {
         streamIdx: -1,
@@ -479,12 +481,21 @@ init.fn.snap = function(opts) {
         return Promise.resolve('');
     }
     if (sopts.streamIdx === inst.currStreamIdx) {
-        return snap(inst, sopts);
+        return new Promise(resolve => {
+            setTimeout(resolve, sopts.snapDelay, {inst, sopts});
+        }).then(({inst, sopts}) => {
+            return snap(inst, sopts);
+        });
     }
     else {
         return inst.connect(sopts.streamIdx)
             .then(() => {
-                return snap(inst, sopts);
+                return new Promise(resolve => {
+                    setTimeout(resolve, sopts.switchDelay, sopts);
+                });
+            })
+            .then((sopts: SnapParams) => {
+                return inst.snap(sopts);
             });
     }
 
@@ -515,6 +526,13 @@ init.fn.prepare_snap_opts = function(opts) {
     }
     else {
         sopts = <SnapParams> inst.get_stream_config(sidx);
+    }
+
+    if (sopts.switchDelay < 0 || Number.isNaN(+sopts.switchDelay)) {
+        sopts.switchDelay = 1500;
+    }
+    if (sopts.snapDelay < 0 || Number.isNaN(+sopts.snapDelay)) {
+        sopts.snapDelay = 0;
     }
 
     sopts.streamIdx = sidx;
@@ -755,6 +773,8 @@ export interface BaseConfig {
     imageFormat:  'jpeg' | 'png';
     jpegQuality:  number;
     dataType:   ImgDataType;
+    switchDelay: number;
+    snapDelay: number;
 }
 export interface Config extends BaseConfig {}
 export interface StreamConfig extends BaseConfig {
@@ -769,6 +789,8 @@ export interface SnapParams {
     imageFormat:  'jpeg' | 'png';
     jpegQuality:  number;
     dataType:   ImgDataType;
+    switchDelay: number;
+    snapDelay: number;
 }
 
 export interface VideoConstraints {
