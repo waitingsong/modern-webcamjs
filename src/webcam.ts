@@ -501,40 +501,8 @@ init.fn.snap = function(opts) {
         console.error('stream not lived');
         return Promise.resolve('');
     }
-    const cvs: HTMLCanvasElement = document.createElement('canvas');
 
-    cvs.width = sopts.width;
-    cvs.height = sopts.height;
-    const ctx = cvs.getContext('2d');
-
-    if ( ! ctx) {
-        console.error('ctx empty');
-        return Promise.resolve('');
-    }
-
-    // flip canvas horizontally if desired
-    if (sopts.flipHoriz) {
-        ctx.translate(sopts.width, 0);
-        ctx.scale(-1, 1);
-    }
-    const video = inst.video;
-
-    if (video) {
-        ctx.drawImage(video, 0, 0, sopts.width, sopts.height);
-
-        return new Promise<string>((resolve, reject) => {
-            const durl = cvs.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100);
-
-            return resolve(durl ? durl : '');
-        }).catch(err => {
-            console.error(err);
-            return '';
-        });
-    }
-    else {
-        console.error('video empty');
-        return Promise.resolve('');
-    }
+    return snap(inst, sopts);
 };
 
 /* ---------- init method END -------------- */
@@ -689,6 +657,43 @@ function attach_stream(inst: Inst, sidx: StreamIdx, stream): Promise<string | vo
             reject('attach_stream() params inst or stream invalid');
         }
     });
+}
+
+function snap(inst: Inst, sopts: SnapParams): Promise<string> {
+    const cvs: HTMLCanvasElement = document.createElement('canvas');
+
+    cvs.width = sopts.width;
+    cvs.height = sopts.height;
+    const ctx = cvs.getContext('2d');
+
+    if ( ! ctx) {
+        console.error('ctx empty');
+        return Promise.resolve('');
+    }
+
+    // flip canvas horizontally if desired
+    if (sopts.flipHoriz) {
+        ctx.translate(sopts.width, 0);
+        ctx.scale(-1, 1);
+    }
+    const video = inst.video;
+
+    if (video) {
+        ctx.drawImage(video, 0, 0, sopts.width, sopts.height);
+
+        return new Promise<string>((resolve, reject) => {
+            const durl = cvs.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100);
+
+            return resolve(durl ? durl : '');
+        }).catch(err => {
+            console.error(err);
+            return '';
+        });
+    }
+    else {
+        console.error('video empty');
+        return Promise.resolve('');
+    }
 }
 
 function assert_never(x: never): never {
