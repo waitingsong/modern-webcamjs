@@ -30,7 +30,7 @@ interface cam {
 const cam: cam = {
     guid: 1,
     _instances: new Map(),  // guid:Inst
-    config: <Config> {
+    config: {
         debug: false,
         useDefault: true,
         ctx: '',
@@ -42,6 +42,7 @@ const cam: cam = {
         height:   480,
         imageFormat:  'jpeg',
         jpegQuality:  95,
+        dataType:   'dataURL',
     },
     streamConfig: <StreamConfig> {
         streamIdx: -1,
@@ -471,11 +472,11 @@ init.fn.snap = function(opts) {
 
     if (typeof opts === 'undefined') {
         sidx = inst.currStreamIdx;
-        sopts = <StreamConfig> inst.get_stream_config(sidx);
+        sopts = <SnapParams> inst.get_stream_config(sidx);
     }
     else if (typeof opts === 'number') {
         sidx = opts;
-        sopts = <StreamConfig> inst.get_stream_config(sidx);
+        sopts = <SnapParams> inst.get_stream_config(sidx);
     }
     else if (typeof opts === 'object' && opts) {
         sidx = +opts.streamIdx;
@@ -720,8 +721,8 @@ export interface BaseConfig {
     width: number;
     height:  number;
     imageFormat:  string;
-    dataType:   ImgDataType;
     jpegQuality:  number;
+    dataType:   ImgDataType;
 }
 export interface Config extends BaseConfig {}
 export interface StreamConfig extends BaseConfig {
@@ -734,8 +735,8 @@ export interface SnapParams {
     height: number;
     flipHoriz: boolean;
     imageFormat:  string;
-    dataType:   ImgDataType;
     jpegQuality:  number;
+    dataType:   ImgDataType;
 }
 
 export interface VideoConstraints {
