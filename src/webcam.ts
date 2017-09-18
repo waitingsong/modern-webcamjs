@@ -302,7 +302,7 @@ init.fn._set = function(sconfig) {
     if ( ! sconfig) {
         return;
     }
-    const defaults = Object.assign({}, cam.config, cam.streamConfig);
+    const defaults = Object.assign({}, cam.streamConfig, inst.config);
     const sidx = +sconfig.streamIdx;
 
     if (Number.isNaN(sidx)) {
@@ -469,7 +469,7 @@ init.fn.snap = function(opts) {
     const inst = this;
     const sopts = inst.prepare_snap_opts(opts); // snap opts
 
-    if (Number.isNaN(+sopts.streamIdx)) {
+    if ( ! sopts || Number.isNaN(+sopts.streamIdx)) {
         console.error('streamIdx invalid');
         return Promise.resolve('');
     }
@@ -690,13 +690,30 @@ function snap(inst: Inst, sopts: SnapParams): Promise<string> {
         ctx.drawImage(video, 0, 0, sopts.width, sopts.height);
 
         return new Promise<string>((resolve, reject) => {
-            const durl = cvs.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100);
+            switch (sopts.dataType)  {
+                case 'dataURL':
+                case 'dataurl':
+                    return resolve(cvs.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100));
 
-            return resolve(durl ? durl : '');
-        }).catch(err => {
-            console.error(err);
-            return '';
-        });
+                case 'objectURL':
+                case 'objecturl':
+                    return cvs.toBlob((blob) => {
+                        // need call URL.revokeObjectURL(ourl) later
+                        resolve(blob ? URL.createObjectURL(blob) : '');
+                    }, 'image/' + sopts.imageFormat, sopts.jpegQuality / 100);
+
+                default:
+                    assert_never(sopts.dataType);
+                    return resolve('');
+            }
+        })
+            .then(url => {
+                return url ? url : '';
+            })
+            .catch(err => {
+                console.error(err);
+                return '';
+            });
     }
     else {
         console.error('video empty');
@@ -716,7 +733,7 @@ export type CamIdx = number;    // index of multi cameras
 export type StreamIdx = number;    // the track index of camera output. 0 for primaray/master, 1 for secondary/slave
 export type DevLabel = string;
 export type stor = string | HTMLElement;
-export type ImgDataType = 'dataURL' | 'objectURL';
+export type ImgDataType = 'dataURL' | 'dataurl' | 'objectURL' | 'objecturl';
 export interface BaseConfig {
     debug: boolean;
     useDefault: boolean;    // use default camera during labelList empty
