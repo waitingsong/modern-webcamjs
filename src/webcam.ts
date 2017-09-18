@@ -467,8 +467,26 @@ init.fn.stop_media = function(sidx) {
 
 init.fn.snap = function(opts) {
     const inst = this;
-    let sidx: number;
-    let sopts: SnapParams;  // snap opts
+    const sopts = inst.prepare_snap_opts(opts); // snap opts
+
+    if (Number.isNaN(+sopts.streamIdx)) {
+        console.error('streamIdx invalid');
+        return Promise.resolve('');
+    }
+
+    if ( ! inst.live) {
+        console.error('stream not lived');
+        return Promise.resolve('');
+    }
+
+    return snap(inst, sopts);
+};
+
+
+init.fn.prepare_snap_opts = function(opts) {
+    const inst = this;
+    let sopts: SnapParams;
+    let sidx;
 
     if (typeof opts === 'undefined') {
         sidx = inst.currStreamIdx;
@@ -480,30 +498,19 @@ init.fn.snap = function(opts) {
     }
     else if (typeof opts === 'object' && opts) {
         sidx = +opts.streamIdx;
+        if (Number.isNaN(sidx)) {
+            sidx = inst.currStreamIdx;
+        }
         const sconfig = inst.get_stream_config(sidx);
 
-        sopts = Object.assign({}, (sconfig ? sconfig : {}) , opts);
+        sopts = <SnapParams> Object.assign({}, (sconfig ? sconfig : {}) , opts);
     }
     else {
-        assert_never(opts);
-        return Promise.resolve('');
+        sopts = <SnapParams> inst.get_stream_config(sidx);
     }
 
-    if (typeof sopts === 'undefined' ||  ! sopts ) {
-        console.error('snap opts invalid');
-        return Promise.resolve('');
-    }
-    if (Number.isNaN(+sopts.streamIdx) || sopts.streamIdx < 0) {
-        console.error('streamIdx invalid');
-        return Promise.resolve('');
-    }
-
-    if ( ! inst.live) {
-        console.error('stream not lived');
-        return Promise.resolve('');
-    }
-
-    return snap(inst, sopts);
+    sopts.streamIdx = sidx;
+    return sopts;
 };
 
 /* ---------- init method END -------------- */
@@ -720,7 +727,7 @@ export interface BaseConfig {
     flipHoriz: boolean;
     width: number;
     height:  number;
-    imageFormat:  string;
+    imageFormat:  'jpeg' | 'png';
     jpegQuality:  number;
     dataType:   ImgDataType;
 }
@@ -730,11 +737,11 @@ export interface StreamConfig extends BaseConfig {
     deviceName?:   string;
 }
 export interface SnapParams {
-    streamIdx: StreamIdx
+    streamIdx: StreamIdx;
     width: number;
     height: number;
     flipHoriz: boolean;
-    imageFormat:  string;
+    imageFormat:  'jpeg' | 'png';
     jpegQuality:  number;
     dataType:   ImgDataType;
 }
@@ -763,6 +770,7 @@ export interface InitFn {
     stop_media(this: Inst, sidx: StreamIdx): Inst;
     connect(this: Inst, sidx: StreamIdx): Promise<Inst>;
     snap(this: Inst, opts?: StreamIdx | SnapParams): Promise<string>;
+    prepare_snap_opts(this: Inst, opts: StreamIdx | SnapParams | void): SnapParams | void;
 }
 export interface Inst extends InitFn {
     guid: Guid;
