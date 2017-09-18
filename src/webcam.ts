@@ -305,8 +305,14 @@ init.fn._set = function(sconfig) {
         return;
     }
     const defaults = Object.assign({}, cam.streamConfig, inst.config);
-    const sidx = +sconfig.streamIdx;
+    let sidx;
 
+    if (typeof sconfig.streamIdx === 'undefined') {
+        sidx = gen_stream_idx(inst);
+    }
+    else {
+        sidx = +sconfig.streamIdx;
+    }
     if (Number.isNaN(sidx)) {
         console.error('set() param streamIdx invalid');
         return;
@@ -327,6 +333,9 @@ init.fn._set = function(sconfig) {
     set_stream_config(inst, sidx, p);
 };
 
+init.fn.sidx_exists = function(sidx) {
+    return this.streamConfigMap.has(sidx);
+};
 
 init.fn.get_stream_config = function(sidx) {
     return this.streamConfigMap.get(sidx);
@@ -747,6 +756,29 @@ function snap(inst: Inst, sopts: SnapParams): Promise<string> {
     }
 }
 
+function gen_stream_idx(inst: Inst): number {
+    const arr = inst.get_all_stream_idx();
+
+    if ( ! arr || ! arr.length) {
+        return 0;
+    }
+
+    let {[arr.length - 1]: sidx} = arr;
+    sidx += 1;
+    if ( ! inst.sidx_exists(sidx)) {
+        return sidx;
+    }
+
+    for (let i = 1, len = arr.length; i <= len; i++) {
+        sidx = i;
+        if ( ! inst.sidx_exists(sidx)) {
+            break;
+        }
+    }
+
+    return sidx;
+}
+
 function assert_never(x: never): never {
     throw new Error('Unexpected object: ' + x);
 }
@@ -811,6 +843,7 @@ export interface InitFn {
     set(this: Inst, sconfig: StreamConfig | StreamConfig[]): Inst;
     _set(this: Inst, sconfig: StreamConfig): void;
     _set_stream_device_label(this: Inst, sconfig: StreamConfig): Inst;
+    sidx_exists(this: Inst, sidx: StreamIdx): boolean;
     get_stream_config(this: Inst, sidx: StreamIdx): StreamConfig | void;
     get_all_stream_idx(this: Inst): StreamIdx[];
     release_stream(this: Inst, sidx: StreamIdx): Inst;
