@@ -114,6 +114,9 @@ const init = <Init> function(config): Inst {
         }
 
         _init(inst);
+        const sconfig = Object.assign({}, cam.streamConfig, inst.config);
+
+        inst._set(sconfig);
         cam._instances.set(inst.guid, inst);
         // devList maybe empty at this time
         return inst;
@@ -307,10 +310,9 @@ init.fn._set = function(sconfig) {
     if ( ! sconfig) {
         return;
     }
-    const defaults = Object.assign({}, cam.streamConfig, inst.config);
     let sidx;
 
-    if (typeof sconfig.streamIdx === 'undefined') {
+    if (typeof sconfig.streamIdx === 'undefined' || sconfig.streamIdx === -1) {
         sidx = gen_stream_idx(inst);
     }
     else {
@@ -331,7 +333,12 @@ init.fn._set = function(sconfig) {
     }
     p.streamIdx = sidx;
     p.ctx = inst.config.ctx;
-    p = Object.assign({}, defaults, p);
+
+    const sconfigOri = inst.get_stream_config(sidx);
+
+    if (sconfigOri) {
+        p = Object.assign({}, sconfigOri, p);
+    }
 
     set_stream_config(inst, sidx, p);
 };
