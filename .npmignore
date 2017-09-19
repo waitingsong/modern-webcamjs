@@ -8,3 +8,4 @@ tslint.json
 .eslintrc.json
 *.swp
 *.bak
+demo/
