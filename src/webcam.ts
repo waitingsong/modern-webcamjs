@@ -339,6 +339,11 @@ init.fn._set = function(sconfig) {
     if (sconfigOri) {
         p = Object.assign({}, sconfigOri, p);
     }
+    else if (sconfig.streamIdx !== -1) {
+        const defaults = Object.assign({}, cam.streamConfig, inst.config);
+
+        p = Object.assign({}, defaults, p);
+    }
 
     set_stream_config(inst, sidx, p);
 };
