@@ -39,7 +39,7 @@ const cam: cam = {
         ctx: '',
         fps: 30,
         previewWidth: 320,
-        previewHeight: 280,
+        previewHeight: 240,
         flipHoriz: false,
         width:    0,
         height:   0,
