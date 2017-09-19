@@ -351,7 +351,7 @@ init.fn.get_all_stream_idx = function() {
 
 
 // connect selected vedio
-init.fn.connect = function(sidx) {
+init.fn.connect = function(sidx = 0) {
     const inst = this;
 
     sidx = +sidx;
