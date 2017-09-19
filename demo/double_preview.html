@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="renderer" content="webkit">
+<title>Modern-Webcam Test Page</title>
+
+<style type="text/css">
+  body { font-family: Helvetica, sans-serif; }
+  h2, h3 { margin-top:0; }
+  .snapshot {margin: 5px; font-size: 1.2em;}
+  .preview {float:left; margin:10px; width: 320px;}
+  #result {float:left; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+  #snap {width: auto;}
+  #code {clear: both; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+</style>
+</head>
+<body>
+	<h1>Modern Webcam Test Page</h1>
+	<h3>Demonstrates double cameras with double preview</h3>
+  <div class="preview">
+    <div class="foo" id="my_camera_0"></div>
+  </div>
+  <div class="preview">
+    <div class="foo" id="my_camera_1"></div>
+  </div>
+
+  <div id="code">
+    <pre>
+    
+  &lt;script src="./require.min.js" >&lt;/script>
+  &lt;script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        // create an instance and initialize it
+        const config0 = {
+            ctx: '#my_camera_0',
+            streamIdx: 0,   // start at 0
+        }
+
+        Webcam(config0).connect(0); 
+
+        // create another instance and initialize it
+        const config1 = {
+            ctx: '#my_camera_1',
+            streamIdx: 1,
+        }
+
+        Webcam(config1).connect(1);
+    });
+
+  &lt;/script>
+    
+    
+    </pre>
+  </div>
+
+  <script src="./require.min.js" ></script>
+  <script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        // create an instance and initialize it
+        const config0 = {
+            ctx: '#my_camera_0',
+            streamIdx: 0,   // start at 0
+        }
+
+        Webcam(config0).connect(0); 
+
+        // create another instance and initialize it
+        const config1 = {
+            ctx: '#my_camera_1',
+            streamIdx: 1,
+        }
+
+        Webcam(config1).connect(1);
+    });
+
+
+  </script>
+
+</body>
+</html>
