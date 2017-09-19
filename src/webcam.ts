@@ -57,17 +57,17 @@ const cam: cam = {
 
 
 // static method
-export interface Cam {
-    (this: Cam, config: Config): Inst;
+export interface Webcam {
+    (this: Webcam, config: Config): Inst;
     _init(config: Config): Inst | void;
     get_device_list(): Promise<MediaDeviceInfo[] | void>;
     get_inst_by_guid(guid: Guid): Inst | void;
     get_insts(): Inst[] | void;
     destroy(): void;
-    fn: CamFn;
+    fn: WebcamFn;
     v: string;
 }
-export interface CamFn {
+export interface WebcamFn {
     init: Init;
     [s: string]: any;
 }
@@ -78,10 +78,10 @@ export interface Init {
     fn: InitFn;
 }
 
-export const Cam: Cam = <Cam> function(config) {
-    return Cam._init(config);
+export const Webcam: Webcam = <Webcam> function(config) {
+    return Webcam._init(config);
 };
-Cam.v = '1.0.0';
+Webcam.v = '1.0.0';
 
 const init = <Init> function(config): Inst {
     if (config && typeof config === 'object') {
@@ -186,14 +186,14 @@ function _init(inst: Inst): void {
 }
 
 
-Cam.fn = Cam.prototype;
-// init.fn = init.prototype = Cam.fn;
+Webcam.fn = Webcam.prototype;
+// init.fn = init.prototype = Webcam.fn;
 init.fn = init.prototype;
-Cam.fn.init = init;
+Webcam.fn.init = init;
 
-Cam._init = function(config) {
+Webcam._init = function(config) {
     try {
-        return new Cam.fn.init(config);
+        return new Webcam.fn.init(config);
     }
     catch(ex) {
         console.error(ex);
@@ -215,7 +215,7 @@ function init_mod(): Promise<boolean> {
     }
 
     window.addEventListener('beforeunload', (event) => {
-        Cam.destroy();
+        Webcam.destroy();
     });
 
     return mediaDevices.enumerateDevices()
@@ -241,7 +241,7 @@ function gotDevices(deviceInfos: MediaDeviceInfo[]): void {
     }
 }
 
-Cam.get_device_list = function() {
+Webcam.get_device_list = function() {
     return pms.then(res => {
         if (res) {
             return devList;
@@ -250,7 +250,7 @@ Cam.get_device_list = function() {
 };
 
 
-Cam.get_inst_by_guid = function(guid) {
+Webcam.get_inst_by_guid = function(guid) {
     const inst = cam._instances.get(+guid);
 
     if ( ! inst) {
@@ -260,15 +260,15 @@ Cam.get_inst_by_guid = function(guid) {
     return inst;
 };
 
-Cam.get_insts = function() {
+Webcam.get_insts = function() {
     if ( ! cam._instances.size) {
         return;
     }
     return Array.from(cam._instances.values());
 };
 
-// destroy Cam module
-Cam.destroy = function() {
+// destroy Webcam module
+Webcam.destroy = function() {
     const insts = this.get_insts();
 
     if (insts) {
@@ -881,5 +881,5 @@ export interface Inst extends InitFn {
 }
 
 
-export default Cam;
+export default Webcam;
 
