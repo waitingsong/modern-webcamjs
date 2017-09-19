@@ -787,15 +787,10 @@ function gen_stream_idx(inst: Inst): number {
     if ( ! inst.sidx_exists(sidx)) {
         return sidx;
     }
-
-    for (let i = 1, len = arr.length; i <= len; i++) {
-        sidx = i;
-        if ( ! inst.sidx_exists(sidx)) {
-            break;
-        }
+    else {
+        sidx = Math.max(...arr) + 1;
+        return sidx;
     }
-
-    return sidx;
 }
 
 function assert_never(x: never): never {
