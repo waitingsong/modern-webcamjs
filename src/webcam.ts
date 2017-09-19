@@ -46,7 +46,7 @@ const cam: cam = {
         imageFormat:  'jpeg',
         jpegQuality:  95,
         dataType:   'dataURL',
-        switchDelay: 1500,  // msec. waiting time for vedio ready to snap() when camera switching needed. no switching no snap delay
+        switchDelay: 100,  // msec. waiting time for vedio ready to snap() when camera switching needed. no switching no snap delay
         snapDelay: 0,        // msec. waiting time before snap()
     },
     streamConfig: <StreamConfig> {
@@ -529,10 +529,14 @@ init.fn.snap = function(opts) {
         });
     }
     else {
+        // increase delay during first preview
+        const ready = inst.streamMap.get(sopts.streamIdx);
+        const delay = ready ? sopts.switchDelay : sopts.switchDelay + 1500;
+
         return inst.connect(sopts.streamIdx)
             .then(() => {
                 return new Promise(resolve => {
-                    setTimeout(resolve, sopts.switchDelay, sopts);
+                    setTimeout(resolve, delay, sopts);
                 });
             })
             .then((sopts: SnapParams) => {
@@ -569,10 +573,10 @@ init.fn.prepare_snap_opts = function(opts) {
     }
 
     if (sopts.switchDelay < 0 || Number.isNaN(+sopts.switchDelay)) {
-        sopts.switchDelay = 1500;
+        sopts.switchDelay = cam.config.switchDelay;
     }
     if (sopts.snapDelay < 0 || Number.isNaN(+sopts.snapDelay)) {
-        sopts.snapDelay = 0;
+        sopts.snapDelay = cam.config.snapDelay;
     }
 
     sopts.streamIdx = sidx;
