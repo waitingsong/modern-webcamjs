@@ -1,9 +1,9 @@
 /**
- * Modern-Webcam
+ * Modern-WebcamJS
  *
  * @author waiting
  * @license MIT
- * @link https://github.com/waitingsong/modern-webcam
+ * @link https://github.com/waitingsong/modern-webcamjs
  */
 
 
