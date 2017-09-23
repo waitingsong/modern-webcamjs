@@ -244,12 +244,24 @@ function init_mod(): Promise<boolean> {
         Webcam.destroy();
     });
 
-    return mediaDevices.enumerateDevices()
-    .then((devices: MediaDeviceInfo[]) => {
-        gotDevices(devices);
-        return true;
-    })
-    .catch(handleError);
+
+    return Promise.race(
+        [
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    console.error('init timeout failed')
+                    resolve();
+                }, 30000); // @HARDCODED
+            }),
+
+            mediaDevices.enumerateDevices()
+            .then((devices: MediaDeviceInfo[]) => {
+                gotDevices(devices);
+                return true;
+            })
+            .catch(handleError)
+        ]
+    );
 }
 
 
