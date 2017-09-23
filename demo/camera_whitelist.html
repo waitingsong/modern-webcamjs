@@ -36,13 +36,8 @@
   &lt;script src="./require.min.js" >&lt;/script>
   &lt;script>
     requirejs(['../dist/webcam'], ({Webcam}) => {
-        window.Webcam = Webcam;
-        Webcam.get_device_list().then(({length = 0}) => {
-            window.camCount = length;
-        });
-
         // define whitelist of keyword of devices label. 
-        // device not availble if defined devName not exists in it
+        // device not availble if devName not exists in it
         const devLabels = [
             'USB Camera', 
         ];
@@ -50,31 +45,29 @@
         // create an instance and initialize it
         const config = {
             ctx: '#my_camera',
+            multiOptions: [
+                // this camera can be accessed
+                {
+                    streamIdx: 0, 
+                    // define keyword of attaced device name, case sensitive 
+                    deviceName: 'Camera',
+                },
+                // this can NOT be accessed cause of 'Scanner' not existing in devLabels
+                {
+                    streamIdx: 1,
+                    // define keyword of attaced device name, case sensitive 
+                    deviceName: 'Scanner',  
+                },
+            ],
 
             // no available device if useDefault:false and devName not exists in devLabels
             useDefault: false,  
             devLabels,
         }
-        const cam = Webcam(config);
-        // multi snap options for multi device
-        const opts = [
-            // this camera can be accessed
-            {
-                streamIdx: 0, 
-                // define keyword of attaced device name, case sensitive 
-                deviceName: 'Camera',  
-            },
 
-            // this can NOT be accessed cause of 'Scanner' not existing in devLabels
-            {
-                streamIdx: 1,
-                // define keyword of attaced device name, case sensitive 
-                deviceName: 'Scanner',
-            },
-        ];
-
-        cam.set(opts).connect(0);   // preview camera index 0
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot(sidx) {
@@ -86,11 +79,7 @@
 
     function toggle_camera() {
         // switch will be failed be cause streamIdx1 not available
-        
-        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
-
-        cam.connect(next);
-        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+        cam.connect(1);
     }
 
   &lt;/script>
@@ -102,11 +91,6 @@
   <script src="./require.min.js" ></script>
   <script>
     requirejs(['../dist/webcam'], ({Webcam}) => {
-        window.Webcam = Webcam;
-        Webcam.get_device_list().then(({length = 0}) => {
-            window.camCount = length;
-        });
-
         // define whitelist of keyword of devices label. 
         // device not availble if devName not exists in it
         const devLabels = [
@@ -116,27 +100,26 @@
         // create an instance and initialize it
         const config = {
             ctx: '#my_camera',
+            multiOptions: [
+                // this camera can be accessed
+                {
+                    streamIdx: 0, 
+                    deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+                },
+                // this can NOT be accessed cause of 'Scanner' not existing in devLabels
+                {
+                    streamIdx: 1,
+                    deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+                },
+            ],
 
             useDefault: false,  // no available device if useDefault:false and devName not exists in devLabels
             devLabels,
         }
-        const cam = Webcam(config);
-        // multi snap options for multi device
-        const opts = [
-            // this camera can be accessed
-            {
-                streamIdx: 0, 
-                deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
-            },
-            // this can NOT be accessed cause of 'Scanner' not existing in devLabels
-            {
-                streamIdx: 1,
-                deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
-            },
-        ];
 
-        cam.set(opts).connect(0);   // preview camera index 0
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot(sidx) {
@@ -147,10 +130,8 @@
     }
 
     function toggle_camera() {
-        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
-
-        cam.connect(next);
-        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+        // switch will be failed be cause streamIdx1 not available
+        cam.connect(1);
     }
 
   </script>
