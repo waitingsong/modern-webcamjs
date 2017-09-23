@@ -42,15 +42,13 @@
             imageFormat:  'jpeg',
             jpegQuality:  97,
         }
-        const cam = Webcam(config);
 
-        cam.connect().then(cam => {
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
             cam.snap().then(url => {
                 document.querySelector('img#snap').src = url;
             })
         });
-
-        window.cam = cam;
     });
 
     function take_snapshot() {
@@ -76,15 +74,14 @@
             imageFormat:  'jpeg',
             jpegQuality:  97,
         }
-        const cam = Webcam(config);
 
-        cam.connect().then(cam => {
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+
             cam.snap().then(url => {
                 document.querySelector('img#snap').src = url;
             })
         });
-
-        window.cam = cam;
     });
 
     function take_snapshot() {

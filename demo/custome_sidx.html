@@ -18,7 +18,7 @@
 </head>
 <body>
 	<h1>Modern WebcamJS Test Page</h1>
-	<h3>Demonstrates double cameras</h3>
+	<h3>Demonstrates multiple cameras and custome streamIdx:</h3>
   <div class="preview">
     <input type=button class="snapshot" value="Toggle camera" onclick="toggle_camera()">
     <input type=button class="snapshot" value="Take Snapshot from master" onclick="take_snapshot(0)">
@@ -43,25 +43,21 @@
             previewHeight: 300,
             imageFormat:  'jpeg',
             jpegQuality:  97,
+            multiOptions: [
+                {
+                    streamIdx: 10,   // MUST defined! can be any positive number
+                    deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+                },
+                {
+                    streamIdx: 20,    // MUST defined! can be any positive number
+                    deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+                },
+            ],
         }
-        const cam = Webcam(config);
-        // multi snap options for multi device
-        const opts = [
-            {
-                streamIdx: 0,   // start at 0
-                width:    400,
-                height:   300,
-            },
-            {
-                streamIdx: 1,
-                width:    320,
-                height:   240,
-                jpegQuality:  95,
-            },
-        ];
-        cam.set(opts).connect(0);   // preview camera index 0
 
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot(sidx) {
@@ -72,12 +68,7 @@
     }
 
     function toggle_camera() {
-        if (cam.currStreamIdx === 0) {
-            cam.connect(1);
-        }
-        else {
-            cam.connect(0);
-        }
+        cam.connect_next();
     }
 
   &lt;/script>
@@ -96,25 +87,21 @@
             previewHeight: 300,
             imageFormat:  'jpeg',
             jpegQuality:  97,
+            multiOptions: [
+                {
+                    streamIdx: 10,   // MUST defined! can be any positive number
+                    deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+                },
+                {
+                    streamIdx: 20,    // MUST defined! can be any positive number
+                    deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+                },
+            ],
         }
-        const cam = Webcam(config);
-        // multi snap options for multi device
-        const opts = [
-            {
-                streamIdx: 0,   // start at 0
-                width:    400,
-                height:   300,
-            },
-            {
-                streamIdx: 1,
-                width:    320,
-                height:   240,
-                jpegQuality:  95,
-            },
-        ];
-        cam.set(opts).connect(0);   // preview camera index 0
 
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot(sidx) {
@@ -125,12 +112,7 @@
     }
 
     function toggle_camera() {
-        if (cam.currStreamIdx === 0) {
-            cam.connect(1);
-        }
-        else {
-            cam.connect(0);
-        }
+        cam.connect_next();
     }
 
   </script>

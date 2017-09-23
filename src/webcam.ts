@@ -53,6 +53,7 @@ const cam: cam = {
          *  ['Scanner', 'USB Camema', ...]
          */
         devLabels: null,
+        multiOptions: null,
     },
     streamConfig: <StreamConfig> {
         streamIdx: -1,
@@ -120,9 +121,21 @@ const init = <Init> function(config): Inst {
         }
 
         _init(inst);
-        const sconfig = Object.assign({}, cam.streamConfig, inst.config);
+        if (inst.config.multiOptions && Array.isArray(inst.config.multiOptions)) {
+            for (let opts of inst.config.multiOptions) {
+                const sconfig = Object.assign({}, cam.streamConfig, inst.config, opts);
 
-        inst._set(sconfig);
+                sconfig.multiOptions = null;
+                inst._set(sconfig);
+            }
+        }
+        else {
+            inst.config.multiOptions = null;
+            const sconfig = Object.assign({}, cam.streamConfig, inst.config);
+
+            inst._set(sconfig);
+        }
+
         cam._instances.set(inst.guid, inst);
         // devList maybe empty at this time
         return inst;
@@ -322,7 +335,11 @@ init.fn._set = function(sconfig) {
     }
     let sidx;
 
-    if (typeof sconfig.streamIdx === 'undefined' || sconfig.streamIdx === -1) {
+    if (typeof sconfig.streamIdx === 'undefined' ) {
+        console.error('set() streamIdx must defined');
+        return;
+    }
+    if (sconfig.streamIdx === -1) { // came from init()
         sidx = gen_stream_idx(inst);
     }
     else {
@@ -373,9 +390,12 @@ init.fn.get_all_stream_idx = function() {
 
 
 // connect selected vedio
-init.fn.connect = function(sidx = 0) {
+init.fn.connect = function(sidx) {
     const inst = this;
 
+    if (typeof sidx === 'undefined') {
+        sidx = inst.get_first_sidx();
+    }
     sidx = +sidx;
 
     if (Number.isNaN(sidx) || sidx < 0) {
@@ -598,6 +618,53 @@ init.fn.prepare_snap_opts = function(opts) {
     sopts.streamIdx = sidx;
     return sopts;
 };
+
+
+// toggle next stream if available attached to this instance
+init.fn.connect_next = function(sidx) {
+    const inst = this;
+
+    return pms.then(res => {
+        if (res) {
+            sidx = inst.get_next_sidx(inst.currStreamIdx);
+            return inst.connect(sidx);
+        }
+        return inst;
+    });
+}
+
+// get next streamIdx by defined sidx, if sidx is the last then return the first
+init.fn.get_next_sidx = function(sidx) {
+    const inst = this;
+    let res: StreamIdx;
+
+    if (inst.sidx_exists(sidx)) {
+        const arr = inst.get_all_stream_idx();
+        const pos = arr.indexOf(sidx);
+
+        if (pos + 1 < arr.length) {
+            res = arr[pos + 1];
+        }
+        else {
+            res = arr[0];
+        }
+    }
+    else {
+        res = 0;
+    }
+
+    return res;
+}
+
+
+init.fn.get_first_sidx = function() {
+    const inst = this;
+    const arr = inst.get_all_stream_idx();
+
+    if (arr[0] >= 0) {
+        return arr[0];
+    }
+}
 
 /* ---------- init method END -------------- */
 
@@ -865,7 +932,9 @@ export interface BaseConfig {
     snapDelay: number;
     devLabels: string[] | null;
 }
-export interface Config extends BaseConfig {}
+export interface Config extends BaseConfig {
+    multiOptions?: StreamConfig[] | null;
+}
 export interface StreamConfig extends BaseConfig {
     streamIdx: StreamIdx;
     deviceName?:   string;
@@ -907,8 +976,11 @@ export interface InitFn {
     release_stream(this: Inst, sidx: StreamIdx): Inst;
     stop_media(this: Inst, sidx: StreamIdx): Inst;
     connect(this: Inst, sidx: StreamIdx): Promise<Inst>;
+    connect_next(this: Inst, sidx?: StreamIdx): Promise<Inst>;
     snap(this: Inst, opts?: StreamIdx | SnapParams): Promise<string>;
     prepare_snap_opts(this: Inst, opts: StreamIdx | SnapParams | void): SnapParams | void;
+    get_next_sidx(this: Inst, sidx: StreamIdx): StreamIdx;
+    get_first_sidx(this: Inst): StreamIdx | void;
 }
 export interface Inst extends InitFn {
     guid: Guid;

@@ -44,10 +44,10 @@
             imageFormat:  'jpeg',
             jpegQuality:  97,
         }
-        const cam = Webcam(config);
 
-        cam.connect();
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot() {
@@ -75,10 +75,10 @@
             imageFormat:  'jpeg',
             jpegQuality:  97,
         }
-        const cam = Webcam(config);
 
-        cam.connect();
-        window.cam = cam;
+        Webcam(config).connect().then(cam => {
+            window.cam = cam;
+        });
     });
 
     function take_snapshot() {
