@@ -21,6 +21,7 @@ let labelList: string[][] = [];
 
 // device detect
 const pms = init_mod();
+let permission = false;
 
 
 interface cam {
@@ -257,7 +258,25 @@ function init_mod(): Promise<boolean> {
             mediaDevices.enumerateDevices()
             .then((devices: MediaDeviceInfo[]) => {
                 gotDevices(devices);
-                return true;
+
+                if ( ! permission) {
+                    // invoke permission
+                    return new Promise(resolve => {
+                        mediaDevices.getUserMedia({
+                            'audio': false,
+                            'video': true,
+                        })
+                            .then(stream => {
+                                resolve(true);
+                            })
+                            .catch(err => {
+                                resolve(false);
+                            });
+                    });
+                }
+                else {
+                    return true;
+                }
             })
             .catch(handleError)
         ]
@@ -274,6 +293,9 @@ function gotDevices(deviceInfos: MediaDeviceInfo[]): void {
         const dev = deviceInfos[i];
 
         if (dev.kind === 'videoinput') {
+            if (dev.label) {
+                permission = true;
+            }
             devList.push(dev);
         }
     }
