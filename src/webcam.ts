@@ -248,44 +248,26 @@ function init_mod(): Promise<boolean> {
 
     return Promise.race(
         [
-            new Promise((resolve) => {
+            new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    console.error('init timeout failed')
-                    resolve();
+                    reject('init timeout failed');
                 }, 30000); // @HARDCODED
             }),
 
-            mediaDevices.enumerateDevices()
-            .then((devices: MediaDeviceInfo[]) => {
-                gotDevices(devices);
-
+            enumerate_devices().then(() => {
                 if ( ! permission) {
                     // invoke permission
-                    return new Promise(resolve => {
-                        mediaDevices.getUserMedia({
-                            'audio': false,
-                            'video': true,
-                        })
-                            .then(stream => {
-                                resolve(true);
-                            })
-                            .catch(err => {
-                                resolve(false);
-                            });
-                    });
+                    return invode_permission();
                 }
-                else {
-                    return true;
-                }
-            })
-            .catch(handleError)
+            }),
         ]
-    );
+    ).catch(handleError);
 }
 
 
 function handleError(err) {
     console.error(err);
+    return err;
 }
 
 function gotDevices(deviceInfos: MediaDeviceInfo[]): void {
@@ -302,8 +284,8 @@ function gotDevices(deviceInfos: MediaDeviceInfo[]): void {
 }
 
 Webcam.get_device_list = function() {
-    return pms.then(res => {
-        if (res) {
+    return pms.then(err => {
+        if ( ! err) {
             return devList;
         }
     });
@@ -441,8 +423,8 @@ init.fn.connect = function(sidx) {
         return Promise.resolve(inst);
     }
 
-    return pms.then(res => {
-        if (res) {
+    return pms.then(err => {
+        if ( ! err) {
             const sconfig = inst.get_stream_config(sidx);
 
             if (sconfig) {
@@ -667,8 +649,8 @@ init.fn.prepare_snap_opts = function(opts) {
 init.fn.connect_next = function(sidx) {
     const inst = this;
 
-    return pms.then(res => {
-        if (res) {
+    return pms.then(err => {
+        if ( ! err) {
             sidx = inst.get_next_sidx(inst.currStreamIdx);
             return inst.connect(sidx);
         }
@@ -947,6 +929,31 @@ function gen_stream_idx(inst: Inst): number {
 
 function assert_never(x: never): never {
     throw new Error('Unexpected object: ' + x);
+}
+
+function enumerate_devices(): Promise<Error | void> {
+    return mediaDevices.enumerateDevices()
+        .then((devices: MediaDeviceInfo[]) => {
+            gotDevices(devices);
+        });
+}
+
+function invode_permission(): Promise<Error | void> {
+    return new Promise((resolve, reject) => {
+        mediaDevices.getUserMedia({
+            'audio': false,
+            'video': true,
+        })
+            .then(stream => {
+                devList.length = 0;
+                enumerate_devices().then(() => {
+                    resolve();
+                });
+            })
+            .catch(err => {
+                reject(err);
+            });
+    });
 }
 
 
