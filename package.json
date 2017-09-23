@@ -11,7 +11,9 @@
   },
   "keywords": [
     "camera",
+    "multiple",
     "html5",
+    "ES6",
     "getusermedia"
   ],
   "module": "./dist/webcam.js",
