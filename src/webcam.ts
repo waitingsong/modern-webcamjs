@@ -587,7 +587,7 @@ init.fn.prepare_snap_opts = function(opts) {
     let sopts: SnapParams;
     let sidx;
 
-    if (typeof opts === 'undefined') {
+    if (typeof opts === 'undefined' || ! opts) {
         sidx = inst.currStreamIdx;
         sopts = <SnapParams> inst.get_stream_config(sidx);
     }
@@ -978,7 +978,7 @@ export interface InitFn {
     connect(this: Inst, sidx: StreamIdx): Promise<Inst>;
     connect_next(this: Inst, sidx?: StreamIdx): Promise<Inst>;
     snap(this: Inst, opts?: StreamIdx | SnapParams): Promise<string>;
-    prepare_snap_opts(this: Inst, opts: StreamIdx | SnapParams | void): SnapParams | void;
+    prepare_snap_opts(this: Inst, opts?: StreamIdx | SnapParams): SnapParams | void;
     get_next_sidx(this: Inst, sidx: StreamIdx): StreamIdx;
     get_first_sidx(this: Inst): StreamIdx | void;
 }

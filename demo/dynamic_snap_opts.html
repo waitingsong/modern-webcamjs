@@ -9,7 +9,7 @@
 <style type="text/css">
   body { font-family: Helvetica, sans-serif; }
   h2, h3 { margin-top:0; }
-  #snapshot {margin: 5px; font-size: 1.2em;}
+  .snapshot {margin: 5px; font-size: 1.2em;}
   .preview {float:left; margin:10px; width: 400px;}
   #result {float:left; margin:10px; padding:10px; border:1px solid; background:#ccc;}
   #snap {width: auto;}
@@ -20,7 +20,8 @@
 	<h1>Modern WebcamJS Test Page</h1>
 	<h3>Demonstrates 400x300 display &amp; dynamic 640*480 capture options </h3>
   <div class="preview">
-    <input type=button id="snapshot" value="Take Snapshot" onclick="take_snapshot()">
+    <input type=button class="snapshot" value="Take Snapshot default with opts" onclick="take_snapshot(1)">
+    <input type=button class="snapshot" value="Take Snapshot with other opts" onclick="take_snapshot(0)">
     <div id="my_camera"></div>
   </div>
   <div id="result">
@@ -50,11 +51,11 @@
 
     function take_snapshot() {
         const opts = {
-            width: 640,
-            height: 480,
+            width: 800,
+            height: 600,
         };
 
-        cam.snap(opts).then(url => {
+        cam.snap(useDefault ? null : opts).then(url => {
           console.log('url len:' + url.length);
           document.querySelector('img#snap').src = url;
         });
@@ -82,13 +83,13 @@
         });
     });
 
-    function take_snapshot() {
+    function take_snapshot(useDefault) {
         const opts = {
-            width: 640,
-            height: 480,
+            width: 800,
+            height: 600,
         };
 
-        cam.snap(opts).then(url => {
+        cam.snap(useDefault ? null : opts).then(url => {
           console.log('url len:' + url.length);
           document.querySelector('img#snap').src = url;
         });
