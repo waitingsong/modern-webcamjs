@@ -10,8 +10,10 @@ Modern-WebcamJS is a JavaScript library for capturing still images from camera(s
 - capture options: https://webcam.xiaozhong.biz/snap_opts.html
 - capture objectURL: https://webcam.xiaozhong.biz/snap_objecturl.html
 - dynamic capture options: https://webcam.xiaozhong.biz/dynamic_snap_opts.html
-- switch camera: https://webcam.xiaozhong.biz/double_camera.html
+- multiple camera: https://webcam.xiaozhong.biz/multi_camera.html
+- custome sidx: https://webcam.xiaozhong.biz/custome_sidx.html
 - double preview: https://webcam.xiaozhong.biz/double_preview.html
+- white list: https://webcam.xiaozhong.biz/camera_whitelist.html
 
 
 
