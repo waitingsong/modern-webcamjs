@@ -394,7 +394,7 @@ init.fn.connect = function(sidx) {
     const inst = this;
 
     if (typeof sidx === 'undefined') {
-        sidx = inst.get_first_sidx();
+        sidx = <StreamIdx> inst.get_first_sidx();
     }
     sidx = +sidx;
 
