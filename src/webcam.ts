@@ -557,8 +557,21 @@ init.fn.snap = function(opts) {
             return (<Inst>inst).snap(opts);
         });
     }
+    let sopts;
 
-    const sopts = inst.prepare_snap_opts(opts); // snap opts
+    if (typeof opts === 'number') {
+        const sconfig = inst.get_stream_config(+opts);
+
+        if ( ! sconfig) {
+            console.error('snap() param streamIdx invald', opts);
+            return Promise.resolve('');
+        }
+        sopts = inst.prepare_snap_opts(sconfig); // snap opts
+    }
+    else {
+        sopts = inst.prepare_snap_opts(opts); // snap opts
+    }
+
 
     if ( ! sopts || Number.isNaN(+sopts.streamIdx)) {
         console.error('streamIdx invalid');
@@ -601,10 +614,6 @@ init.fn.prepare_snap_opts = function(opts) {
 
     if (typeof opts === 'undefined' || ! opts) {
         sidx = inst.currStreamIdx;
-        sopts = <SnapParams> inst.get_stream_config(sidx);
-    }
-    else if (typeof opts === 'number') {
-        sidx = opts;
         sopts = <SnapParams> inst.get_stream_config(sidx);
     }
     else if (typeof opts === 'object' && opts) {
@@ -990,7 +999,7 @@ export interface InitFn {
     connect(this: Inst, sidx: StreamIdx): Promise<Inst>;
     connect_next(this: Inst, sidx?: StreamIdx): Promise<Inst>;
     snap(this: Inst, opts?: StreamIdx | SnapParams): Promise<string>;
-    prepare_snap_opts(this: Inst, opts?: StreamIdx | SnapParams): SnapParams | void;
+    prepare_snap_opts(this: Inst, opts: SnapParams | undefined | null): SnapParams | void;
     get_next_sidx(this: Inst, sidx: StreamIdx): StreamIdx;
     get_first_sidx(this: Inst): StreamIdx | void;
 }
