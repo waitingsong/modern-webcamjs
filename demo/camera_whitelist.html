@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="renderer" content="webkit">
+<title>Modern-WebcamJS Test Page</title>
+
+<style type="text/css">
+  body { font-family: Helvetica, sans-serif; }
+  h2, h3 { margin-top:0; }
+  .snapshot {margin: 5px; font-size: 1.2em;}
+  .preview {float:left; margin:10px; width: 400px;}
+  #result {float:left; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+  #snap {width: auto;}
+  #code {clear: both; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+</style>
+</head>
+<body>
+	<h1>Modern WebcamJS Test Page</h1>
+	<h3>Demonstrates multiple cameras with whitelist</h3>
+  <div class="preview">
+    <input type=button class="snapshot" value="Toggle camera" onclick="toggle_camera()">
+    <input type=button class="snapshot" value="Take Snapshot from master" onclick="take_snapshot(0)">
+    <input type=button class="snapshot" value="Take Snapshot from slave" onclick="take_snapshot(1)">
+    <div id="my_camera"></div>
+  </div>
+  <div id="result">
+    <p>captured image will appear here...</p>
+    <img id="snap" />
+  </div>
+
+  <div id="code">
+    <pre>
+    
+  &lt;script src="./require.min.js" >&lt;/script>
+  &lt;script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        window.Webcam = Webcam;
+        Webcam.get_device_list().then(({length = 0}) => {
+            window.camCount = length;
+        });
+
+        // define whitelist of keyword of devices label. 
+        // device not availble if defined devName not exists in it
+        const devLabels = [
+            'USB Camera', 
+        ];
+
+        // create an instance and initialize it
+        const config = {
+            ctx: '#my_camera',
+
+            // no available device if useDefault:false and devName not exists in devLabels
+            useDefault: false,  
+            devLabels,
+        }
+        const cam = Webcam(config);
+        // multi snap options for multi device
+        const opts = [
+            // this camera can be accessed
+            {
+                streamIdx: 0, 
+                // define keyword of attaced device name, case sensitive 
+                deviceName: 'Camera',  
+            },
+
+            // this can NOT be accessed cause of 'Scanner' not existing in devLabels
+            {
+                streamIdx: 1,
+                // define keyword of attaced device name, case sensitive 
+                deviceName: 'Scanner',
+            },
+        ];
+
+        cam.set(opts).connect(0);   // preview camera index 0
+        window.cam = cam;
+    });
+
+    function take_snapshot(sidx) {
+        cam.snap(sidx).then(url => {
+          console.log('url len:' + url.length);
+          document.querySelector('img#snap').src = url;
+        });
+    }
+
+    function toggle_camera() {
+        // switch will be failed be cause streamIdx1 not available
+        
+        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
+
+        cam.connect(next);
+        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+    }
+
+  &lt;/script>
+    
+    
+    </pre>
+  </div>
+
+  <script src="./require.min.js" ></script>
+  <script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        window.Webcam = Webcam;
+        Webcam.get_device_list().then(({length = 0}) => {
+            window.camCount = length;
+        });
+
+        // define whitelist of keyword of devices label. 
+        // device not availble if devName not exists in it
+        const devLabels = [
+            'USB Camera', 
+        ];
+
+        // create an instance and initialize it
+        const config = {
+            ctx: '#my_camera',
+
+            useDefault: false,  // no available device if useDefault:false and devName not exists in devLabels
+            devLabels,
+        }
+        const cam = Webcam(config);
+        // multi snap options for multi device
+        const opts = [
+            // this camera can be accessed
+            {
+                streamIdx: 0, 
+                deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+            },
+            // this can NOT be accessed cause of 'Scanner' not existing in devLabels
+            {
+                streamIdx: 1,
+                deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+            },
+        ];
+
+        cam.set(opts).connect(0);   // preview camera index 0
+        window.cam = cam;
+    });
+
+    function take_snapshot(sidx) {
+        cam.snap(sidx).then(url => {
+          console.log('url len:' + url.length);
+          document.querySelector('img#snap').src = url;
+        });
+    }
+
+    function toggle_camera() {
+        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
+
+        cam.connect(next);
+        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+    }
+
+  </script>
+
+</body>
+</html>

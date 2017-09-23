@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="renderer" content="webkit">
+<title>Modern-WebcamJS Test Page</title>
+
+<style type="text/css">
+  body { font-family: Helvetica, sans-serif; }
+  h2, h3 { margin-top:0; }
+  .snapshot {margin: 5px; font-size: 1.2em;}
+  .preview {float:left; margin:10px; width: 400px;}
+  #result {float:left; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+  #snap {width: auto;}
+  #code {clear: both; margin:10px; padding:10px; border:1px solid; background:#ccc;}
+</style>
+</head>
+<body>
+	<h1>Modern WebcamJS Test Page</h1>
+	<h3>Demonstrates multiple cameras</h3>
+  <div class="preview">
+    <input type=button class="snapshot" value="Toggle camera" onclick="toggle_camera()">
+    <input type=button class="snapshot" value="Take Snapshot from master" onclick="take_snapshot(0)">
+    <input type=button class="snapshot" value="Take Snapshot from slave" onclick="take_snapshot(1)">
+    <div id="my_camera"></div>
+  </div>
+  <div id="result">
+    <p>captured image will appear here...</p>
+    <img id="snap" />
+  </div>
+
+  <div id="code">
+    <pre>
+    
+  &lt;script src="./require.min.js" >&lt;/script>
+  &lt;script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        window.Webcam = Webcam;
+        Webcam.get_device_list().then(({length = 0}) => {
+            window.camCount = length;
+        });
+
+        // create an instance and initialize it
+        const config = {
+            ctx: '#my_camera',
+            previewWidth: 400,
+            previewHeight: 300,
+            imageFormat:  'jpeg',
+            jpegQuality:  97,
+        }
+        const cam = Webcam(config);
+        // multi snap options for multi device
+        const opts = [
+            {
+                streamIdx: 0, 
+                width:    400,
+                height:   300,
+                deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+            },
+            {
+                streamIdx: 1,
+                width:    320,
+                height:   240,
+                jpegQuality:  95,
+                deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+            },
+        ];
+
+        cam.set(opts).connect(0);   // preview camera index 0
+        window.cam = cam;
+    });
+
+    function take_snapshot(sidx) {
+        cam.snap(sidx).then(url => {
+          console.log('url len:' + url.length);
+          document.querySelector('img#snap').src = url;
+        });
+    }
+
+    function toggle_camera() {
+        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
+
+        cam.connect(next);
+        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+    }
+
+  &lt;/script>
+    
+    
+    </pre>
+  </div>
+
+  <script src="./require.min.js" ></script>
+  <script>
+    requirejs(['../dist/webcam'], ({Webcam}) => {
+        window.Webcam = Webcam;
+        Webcam.get_device_list().then(({length = 0}) => {
+            window.camCount = length;
+        });
+
+        // create an instance and initialize it
+        const config = {
+            ctx: '#my_camera',
+            previewWidth: 400,
+            previewHeight: 300,
+            imageFormat:  'jpeg',
+            jpegQuality:  97,
+        }
+        const cam = Webcam(config);
+        // multi snap options for multi device
+        const opts = [
+            {
+                streamIdx: 0, 
+                width:    400,
+                height:   300,
+                deviceName: 'Camera',   // define keyword of attaced device name, case sensitive 
+            },
+            {
+                streamIdx: 1,
+                width:    320,
+                height:   240,
+                jpegQuality:  95,
+                deviceName: 'Scanner',  // define keyword of attaced device name, case sensitive 
+            },
+        ];
+
+        cam.set(opts).connect(0);   // preview camera index 0
+        window.cam = cam;
+    });
+
+    function take_snapshot(sidx) {
+        cam.snap(sidx).then(url => {
+          console.log('url len:' + url.length);
+          document.querySelector('img#snap').src = url;
+        });
+    }
+
+    function toggle_camera() {
+        const next = (cam.currStreamIdx + 1 < camCount) ? cam.currStreamIdx + 1 : 0;
+
+        cam.connect(next);
+        console.log(`toggle_camera sidx:${next} of ${camCount}`);
+    }
+
+  </script>
+
+</body>
+</html>

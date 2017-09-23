@@ -48,10 +48,16 @@ const cam: cam = {
         dataType:   'dataURL',
         switchDelay: 100,  // msec. waiting time for vedio ready to snap() when camera switching needed. no switching no snap delay
         snapDelay: 0,        // msec. waiting time before snap()
+        /**
+         * defined device's label
+         *  ['Scanner', 'USB Camema', ...]
+         */
+        devLabels: null,
     },
     streamConfig: <StreamConfig> {
         streamIdx: -1,
         deviceName:    '',
+        deviceId: '',
     },
 };
 
@@ -161,6 +167,10 @@ function _init(inst: Inst): void {
 
     if (typeof config.fps !== 'number') {
         config.fps = 30;
+    }
+
+    if (typeof config.devLabels === 'undefined' || ! Array.isArray(config.devLabels)) {
+        config.devLabels = null;
     }
 
     const video = <HTMLVideoElement> document.createElement('video');
@@ -367,8 +377,13 @@ init.fn.connect = function(sidx = 0) {
     const inst = this;
 
     sidx = +sidx;
+
     if (Number.isNaN(sidx) || sidx < 0) {
-        console.error('connect() param sidx invalid');
+        console.error('connect() param sidx invalid: not number or less then zero');
+        return Promise.resolve(inst);
+    }
+    if ( ! inst.sidx_exists(sidx)) {    // sidx0 always exists cause of default
+        console.error(`connect() connecting stream ${sidx} not exists`);
         return Promise.resolve(inst);
     }
 
@@ -399,28 +414,29 @@ init.fn._set_stream_device_label = function(sconfig) {
         return inst;
     }
     const sidx = +sconfig.streamIdx;
-    const arr = get_devices_by_sidx(sidx);
-    let name;
+    let name: DevLabel = '';
 
-    if ( ! arr && inst.config.useDefault) {
-        name = devList[sidx] ? devList[sidx].label : devList[0].label;    // maybe empty during file opened directly insteadof through URL
-    }
-    else if (arr && arr.length) {
-        for (let i = 0, len = arr.length; i < len; i++) {
-            let gotten = false;
-
-            for (let j = 0; j < devList.length; j++) {
-                const label = devList[j].label;
-
-                if (label && label.indexOf(arr[i]) > -1) {
-                    name = label;
-                    break;
-                }
-            }
-            if (gotten) {
-                break;
-            }
+    if (sconfig.deviceName && typeof sconfig.deviceName === 'string') { // match device by  defined deviceName
+         if (inst.config.devLabels) {
+            name = match_label_by_arr(sconfig.deviceName, inst.config.devLabels);
         }
+        else {
+            const arr: DevLabel[] = [];
+
+            for (let i = 0; i < devList.length; i++) {
+                const label = devList[i].label;
+
+                label && arr.push(label)
+            }
+            name = match_label_by_arr(sconfig.deviceName, arr);
+        }
+    }
+    else {  // match device by streamIdx
+        name = get_label_by_sidx(sidx);
+    }
+
+    if ( ! name && inst.config.useDefault) {
+        name = devList[sidx] ? devList[sidx].label : devList[0].label;    // maybe empty during file opened directly insteadof through URL
     }
     sconfig.deviceName = name;
 
@@ -608,14 +624,15 @@ function _switch_stream(inst, sidx): Promise<string | void> {
 }
 
 function _switch_stream_html(inst: Inst, sidx: StreamIdx, sconfig: StreamConfig): Promise<string | void> {
-    if ( ! sconfig.deviceName) {
-        return Promise.reject('_switch_stream_html() deviceName empty');
+    if ( ! sconfig.deviceId) {
+        if ( ! sconfig.deviceName) {
+            return Promise.reject('_switch_stream_html() deviceName empty');
+        }
+        sconfig.deviceId = get_deviceid_by_label(sconfig.deviceName);
+        if ( ! sconfig.deviceId) {
+            return Promise.resolve('deviceId empty');
+        }
     }
-    const deviceId = get_deviceid_by_label(sconfig.deviceName);
-    if ( ! deviceId) {
-        return Promise.resolve('deviceId empty');
-    }
-
     const last = inst.streamMap.get(sidx);
 
     if (last) {
@@ -630,11 +647,9 @@ function _switch_stream_html(inst: Inst, sidx: StreamIdx, sconfig: StreamConfig)
         height: {
             ideal: sconfig.height,
         },
+        deviceId: {exact: sconfig.deviceId},
     };
 
-    if (deviceId) {
-        vOpts.deviceId = {exact: deviceId};
-    }
 
     return mediaDevices.getUserMedia({
         'audio': false,
@@ -659,32 +674,42 @@ function _switch_stream_html(inst: Inst, sidx: StreamIdx, sconfig: StreamConfig)
 
 
 
-// get tracks label have the same index from pre defined label list
-function get_devices_by_sidx(sidx: StreamIdx): DevLabel[] | void {
+function get_label_by_sidx(sidx: StreamIdx): DevLabel {
     sidx = +sidx;
     if (Number.isNaN(sidx) || sidx < 0) {
-        return;
+        return '';
     }
-    if ( ! labelList || ! labelList.length) {
-        return;
+    return devList[sidx] && devList[sidx].label || '';
+}
+
+function match_label_by_arr(devName: DevLabel, arr: DevLabel[]): DevLabel {
+    if ( ! devName || typeof devName !== 'string') {
+        return '';
     }
-    const res: DevLabel[] = [];
 
-    for (let i = 0, len = labelList.length; i < len; i++) {
-        const row = labelList[i];
+    let res = '';
+    const pos = arr.indexOf(devName);
 
-        if (row && Array.isArray(row) && typeof row[sidx] === 'string') {
-            res.push(row[sidx]);
+    if (pos > -1) {
+        res = devName;
+    }
+    else {
+        for (let i = 0; i < arr.length; i++) {
+            const label = arr[i];
+
+            if (label && label.indexOf(devName) > -1) {
+                res = label;
+                break;
+            }
         }
     }
 
-    return res;
+    return res ? res : '';
 }
 
-
-function get_deviceid_by_label(name: string): string | void {
+function get_deviceid_by_label(name: string): string {
     if (typeof name !== 'string' || ! name || ! devList.length) {
-        return;
+        return '';
     }
     const arr = name.split(',');
 
@@ -715,6 +740,7 @@ function get_deviceid_by_label(name: string): string | void {
             return dev.deviceId;
         }
     }
+    return '';
 }
 
 function attach_stream(inst: Inst, sidx: StreamIdx, stream): Promise<string | void> {
@@ -837,11 +863,13 @@ export interface BaseConfig {
     dataType:   ImgDataType;
     switchDelay: number;
     snapDelay: number;
+    devLabels: string[] | null;
 }
 export interface Config extends BaseConfig {}
 export interface StreamConfig extends BaseConfig {
     streamIdx: StreamIdx;
     deviceName?:   string;
+    deviceId?: string;  // MediaTrackConstraints.deviceId
 }
 export interface SnapParams {
     streamIdx: StreamIdx;
