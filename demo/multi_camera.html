@@ -35,6 +35,7 @@
     
   &lt;script src="./require.min.js" >&lt;/script>
   &lt;script>
+    requirejs(['../dist/webcam'], ({webcam}) => {
         // create an instance and initialize it
         const config = {
             ctx: '#my_camera',
@@ -57,7 +58,7 @@
             ],
         }
 
-        Webcam(config).connect().then(cam => {
+        webcam(config).connect().then(cam => {
             window.cam = cam;
         });
     });
@@ -81,7 +82,7 @@
 
   <script src="./require.min.js" ></script>
   <script>
-    requirejs(['../dist/webcam'], ({Webcam}) => {
+    requirejs(['../dist/webcam'], ({webcam}) => {
         // create an instance and initialize it
         const config = {
             ctx: '#my_camera',
@@ -104,7 +105,7 @@
             ],
         }
 
-        Webcam(config).connect().then(cam => {
+        webcam(config).connect().then(cam => {
             window.cam = cam;
         });
     });
