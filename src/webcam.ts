@@ -435,7 +435,6 @@ init.fn.connect = function(sidx) {
                     console.error(err);
                     return inst;
                 });
-
             }
         }
         return inst;
@@ -747,19 +746,12 @@ function _switch_stream_html(inst: Inst, sidx: StreamIdx, sconfig: StreamConfig)
         'audio': false,
         'video': vOpts,
     })
-    .then( function(stream) {
+    .then((stream) => {
         if (stream && inst.video) {
             return attach_stream(inst, sidx, stream);
         }
         else {
-            console.error('vedio or stream blank during switch camera');
-            return Promise.reject('no_retry');
-        }
-    })
-    .catch( function(err) {
-        if (err === 'no_retry') {
-            console.error(err);
-            return;
+            return Promise.reject('vedio or stream blank during switch camera');
         }
     });
 }
