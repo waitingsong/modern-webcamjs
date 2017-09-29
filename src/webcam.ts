@@ -245,11 +245,12 @@ function init_mod(): Promise<boolean> {
         Webcam.destroy();
     });
 
+    let t;
 
     return Promise.race(
         [
             new Promise((resolve, reject) => {
-                setTimeout(() => {
+                t = setTimeout(() => {
                     reject('init timeout failed');
                 }, 30000); // @HARDCODED
             }),
@@ -261,7 +262,16 @@ function init_mod(): Promise<boolean> {
                 }
             }),
         ]
-    ).catch(handleError);
+    )
+    .then(res => {
+        clearTimeout(t);
+        return true;
+    })
+    .catch(err => {
+        clearTimeout(t);
+        handleError(err);
+        return false;
+    });
 }
 
 
