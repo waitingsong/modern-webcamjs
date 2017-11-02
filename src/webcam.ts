@@ -562,7 +562,7 @@ init.fn.snap = function(opts) {
 
     // instance or video not ready
     if ( ! inst.inited || ! inst.live) {
-        return new Promise(resolve => {
+        return new Promise<{inst: Inst, opts: typeof opts}>(resolve => {
             inst.retryCount += 1;
             setTimeout(resolve, 1500, {inst, opts});
         })
@@ -570,7 +570,7 @@ init.fn.snap = function(opts) {
             return (<Inst>inst).snap(opts);
         });
     }
-    let sopts;
+    let sopts: SnapParams;
 
     if (typeof opts === 'number') {
         const sconfig = inst.get_stream_config(+opts);
@@ -579,14 +579,14 @@ init.fn.snap = function(opts) {
             console.error('snap() param streamIdx invald', opts);
             return Promise.resolve('');
         }
-        sopts = inst.prepare_snap_opts(sconfig); // snap opts
+        sopts = <SnapParams> inst.prepare_snap_opts(sconfig); // snap opts
     }
     else {
-        sopts = inst.prepare_snap_opts(opts); // snap opts
+        sopts = <SnapParams> inst.prepare_snap_opts(opts); // snap opts
     }
 
 
-    if ( ! sopts || Number.isNaN(+sopts.streamIdx)) {
+    if (typeof sopts === 'undefined' || ! sopts || Number.isNaN(+sopts.streamIdx)) {
         console.error('streamIdx invalid');
         return Promise.resolve('');
     }
@@ -596,7 +596,7 @@ init.fn.snap = function(opts) {
         return Promise.resolve('');
     }
     if (sopts.streamIdx === inst.currStreamIdx) {
-        return new Promise(resolve => {
+        return new Promise<{inst: Inst, sopts: SnapParams}>(resolve => {
             setTimeout(resolve, sopts.snapDelay, {inst, sopts});
         }).then(({inst, sopts}) => {
             return snap(inst, sopts);
@@ -609,7 +609,7 @@ init.fn.snap = function(opts) {
 
         return inst.connect(sopts.streamIdx)
             .then(() => {
-                return new Promise(resolve => {
+                return new Promise<SnapParams>(resolve => {
                     setTimeout(resolve, delay, sopts);
                 });
             })
@@ -620,7 +620,7 @@ init.fn.snap = function(opts) {
 };
 
 
-init.fn.prepare_snap_opts = function(opts) {
+init.fn.prepare_snap_opts = function(opts): SnapParams {
     const inst = this;
     let sopts: SnapParams;
     let sidx;
