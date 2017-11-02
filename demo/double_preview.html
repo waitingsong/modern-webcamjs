@@ -31,14 +31,14 @@
     
   &lt;script src="./require.min.js" >&lt;/script>
   &lt;script>
-    requirejs(['../dist/webcam'], ({webcam}) => {
+    requirejs(['../dist/webcam'], ({Webcam}) => {
         // create an instance and initialize it
         const config0 = {
             ctx: '#my_camera_0',
             streamIdx: 0,   // start at 0
         }
 
-        webcam(config0).connect(0); 
+        Webcam(config0).connect(0); 
 
         // create another instance and initialize it
         const config1 = {
@@ -46,7 +46,7 @@
             streamIdx: 1,
         }
 
-        webcam(config1).connect(1);
+        Webcam(config1).connect(1);
     });
 
   &lt;/script>
@@ -57,14 +57,14 @@
 
   <script src="./require.min.js" ></script>
   <script>
-    requirejs(['../dist/webcam'], ({webcam}) => {
+    requirejs(['../dist/webcam'], ({Webcam}) => {
         // create an instance and initialize it
         const config0 = {
             ctx: '#my_camera_0',
             streamIdx: 0,   // start at 0
         }
 
-        webcam(config0).connect(0); 
+        Webcam(config0).connect(0); 
 
         // create another instance and initialize it
         const config1 = {
@@ -72,7 +72,7 @@
             streamIdx: 1,
         }
 
-        webcam(config1).connect(1);
+        Webcam(config1).connect(1);
     });
 
 
