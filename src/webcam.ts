@@ -245,7 +245,7 @@ function init_mod(): Promise<Error | void> {
         Webcam.destroy();
     });
 
-    let t;
+    let t: number;
 
     return Promise.race(
         [
@@ -275,7 +275,7 @@ function init_mod(): Promise<Error | void> {
 }
 
 
-function handleError(err) {
+function handleError(err: Error) {
     console.error(err);
     return err;
 }
@@ -359,7 +359,7 @@ init.fn._set = function(sconfig) {
     if ( ! sconfig) {
         return;
     }
-    let sidx;
+    let sidx: StreamIdx;
 
     if (typeof sconfig.streamIdx === 'undefined' ) {
         console.error('set() streamIdx must defined');
@@ -623,7 +623,7 @@ init.fn.snap = function(opts) {
 init.fn.prepare_snap_opts = function(opts): SnapParams {
     const inst = this;
     let sopts: SnapParams;
-    let sidx;
+    let sidx: StreamIdx = 0;
 
     if (typeof opts === 'undefined' || ! opts) {
         sidx = inst.currStreamIdx;
@@ -708,7 +708,7 @@ function set_stream_config(inst: Inst, sidx: StreamIdx, sconfig: StreamConfig): 
 }
 
 
-function _switch_stream(inst, sidx): Promise<string | void> {
+function _switch_stream(inst: Inst, sidx: StreamIdx): Promise<string | void> {
     sidx = +sidx;
     if (sidx && inst.currStreamIdx && sidx === inst.currStreamIdx) {
         console.log('switch the same stream. skipped');
@@ -837,7 +837,7 @@ function get_deviceid_by_label(name: string): string {
     return '';
 }
 
-function attach_stream(inst: Inst, sidx: StreamIdx, stream): Promise<string | void> {
+function attach_stream(inst: Inst, sidx: StreamIdx, stream: void | MediaStream): Promise<string | void> {
     return new Promise((resolve, reject) => {
         if (inst && inst.video && stream) {
             inst.video.onloadedmetadata = function(e) {
@@ -991,6 +991,7 @@ export interface StreamConfig extends BaseConfig {
     streamIdx: StreamIdx;
     deviceName?:   string;
     deviceId?: string;  // MediaTrackConstraints.deviceId
+    [prop: string]: any;
 }
 export interface SnapParams {
     streamIdx: StreamIdx;

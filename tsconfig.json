@@ -8,7 +8,7 @@
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
     "outDir": "./dist",                        /* Redirect output structure to the directory. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
-    "noImplicitAny": false,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+    // "noImplicitAny": false,                 /* Raise error on expressions and declarations with an implied 'any' type. */
     // "noImplicitThis": false,
     "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
     // "inlineSourceMap": true,               /* Emit a single file with source maps instead of having a separate file. */
