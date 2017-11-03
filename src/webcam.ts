@@ -24,14 +24,14 @@ const pms = init_mod();
 let permission = false;
 
 
-interface cam {
+interface Cam {
     guid: Guid;
     _instances: Map<Guid, Inst>;
     config: Config;
     streamConfig: StreamConfig;
 }
 
-const cam: cam = {
+const cam: Cam = {
     guid: 1,
     _instances: new Map(),  // guid:Inst
     config: {
