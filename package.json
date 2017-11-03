@@ -4,9 +4,13 @@
   "description": "HTML5 WebcamJS Image Capture Library",
   "main": "./dist/webcam.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run test && npm run clean && npm run build:ts && npm run jslint",
+    "build:ts": "tsc -p ./ --outDir dist/",
+    "clean": "rm -rf dist/*",
+    "jslint": "eslint --fix dist/**/*.js",
+    "lint": "tslint -p tslint.json ",
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist/* && tsc -p ./ --outDir dist/",
+    "test": "npm run lint",
     "tsc:w": "tsc -p ./tsconfig.json -w"
   },
   "keywords": [
@@ -32,6 +36,7 @@
     "eslint": "^4.10.0",
     "rimraf": "^2.6.1",
     "ts-node": "^3.3.0",
-    "tslint": "^5.7.0"
+    "tslint": "^5.7.0",
+    "typescript": "^2.6.1"
   }
 }
