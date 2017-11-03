@@ -228,9 +228,9 @@ Webcam._init = function(config) {
     }
 };
 
-function init_mod(): Promise<boolean> {
+function init_mod(): Promise<Error | void> {
     if (modInited) {
-        return Promise.resolve(true);
+        return Promise.resolve();
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
@@ -238,7 +238,7 @@ function init_mod(): Promise<boolean> {
         mediaDevices = navigator.mediaDevices;
     }
     else {
-        return Promise.resolve(false);
+        return Promise.resolve(new Error('mediaDevices.getUserMedia not support'));
     }
 
     window.addEventListener('beforeunload', (event) => {
@@ -249,9 +249,9 @@ function init_mod(): Promise<boolean> {
 
     return Promise.race(
         [
-            new Promise((resolve, reject) => {
+            new Promise<void>((resolve, reject) => {
                 t = setTimeout(() => {
-                    reject('init timeout failed');
+                    reject(new Error('init timeout failed'));
                 }, 30000); // @HARDCODED
             }),
 
@@ -263,14 +263,14 @@ function init_mod(): Promise<boolean> {
             }),
         ]
     )
-    .then(res => {
+    .then((err: void | Error) => {
         clearTimeout(t);
-        return true;
+        return err;
     })
     .catch(err => {
         clearTimeout(t);
         handleError(err);
-        return false;
+        return err;
     });
 }
 
