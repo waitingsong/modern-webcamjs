@@ -29,10 +29,9 @@
   },
   "homepage": "https://github.com/waitingsong/modern-webcamjs#readme",
   "devDependencies": {
+    "eslint": "^4.10.0",
     "rimraf": "^2.6.1",
     "ts-node": "^3.3.0",
-    "tslint": "^5.7.0",
-    "tslint-eslint-rules": "^4.1.1",
-    "typescript": "^2.5.2"
+    "tslint": "^5.7.0"
   }
 }
