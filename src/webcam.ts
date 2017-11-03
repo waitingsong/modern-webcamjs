@@ -222,7 +222,7 @@ Webcam._init = function(config) {
     try {
         return new Webcam.fn.init(config);
     }
-    catch(ex) {
+    catch (ex) {
         console.error(ex);
         return;
     }
@@ -471,7 +471,7 @@ init.fn._set_stream_device_label = function(sconfig) {
             for (let i = 0; i < devList.length; i++) {
                 const label = devList[i].label;
 
-                label && arr.push(label)
+                label && arr.push(label);
             }
             name = match_label_by_arr(sconfig.deviceName, arr);
         }
@@ -542,7 +542,7 @@ init.fn.stop_media = function(sidx) {
                     }
                 }
             }
-            catch(ex) {
+            catch (ex) {
                 console.error(ex);
             }
         }
@@ -566,9 +566,9 @@ init.fn.snap = function(opts) {
             inst.retryCount += 1;
             setTimeout(resolve, 1500, {inst, opts});
         })
-        .then(({inst, opts}) => {
-            return (<Inst>inst).snap(opts);
-        });
+            .then(({inst, opts}) => {
+                return (<Inst> inst).snap(opts);
+            });
     }
     let sopts: SnapParams;
 
@@ -659,13 +659,13 @@ init.fn.connect_next = function(sidx) {
     const inst = this;
 
     return pms.then(err => {
-        if ( ! err) {
+        if (!err) {
             sidx = inst.get_next_sidx(inst.currStreamIdx);
             return inst.connect(sidx);
         }
         return inst;
     });
-}
+};
 
 // get next streamIdx by defined sidx, if sidx is the last then return the first
 init.fn.get_next_sidx = function(sidx) {
@@ -688,7 +688,7 @@ init.fn.get_next_sidx = function(sidx) {
     }
 
     return res;
-}
+};
 
 
 init.fn.get_first_sidx = function() {
@@ -698,7 +698,7 @@ init.fn.get_first_sidx = function() {
     if (arr[0] >= 0) {
         return arr[0];
     }
-}
+};
 
 /* ---------- init method END -------------- */
 
@@ -976,10 +976,10 @@ export interface BaseConfig {
     previewHeight: number;
     flipHoriz: boolean;
     width: number;
-    height:  number;
-    imageFormat:  'jpeg' | 'png';
-    jpegQuality:  number;
-    dataType:   ImgDataType;
+    height: number;
+    imageFormat: 'jpeg' | 'png';
+    jpegQuality: number;
+    dataType: ImgDataType;
     switchDelay: number;
     snapDelay: number;
     devLabels: string[] | null;
@@ -989,7 +989,7 @@ export interface Config extends BaseConfig {
 }
 export interface StreamConfig extends BaseConfig {
     streamIdx: StreamIdx;
-    deviceName?:   string;
+    deviceName?: string;
     deviceId?: string;  // MediaTrackConstraints.deviceId
     [prop: string]: any;
 }
@@ -998,9 +998,9 @@ export interface SnapParams {
     width: number;
     height: number;
     flipHoriz: boolean;
-    imageFormat:  'jpeg' | 'png';
-    jpegQuality:  number;
-    dataType:   ImgDataType;
+    imageFormat: 'jpeg' | 'png';
+    jpegQuality: number;
+    dataType: ImgDataType;
     switchDelay: number;
     snapDelay: number;
 }
