@@ -2,7 +2,7 @@
   "name": "npm-base",
   "author": "waiting",
   "version": "0.0.1",
-  "description": "npm boilerplate",
+  "description": "npm amd boilerplate",
   "keywords": [],
   "engines": {
     "node": ">=8.10.0"
@@ -64,7 +64,7 @@
   },
   "scripts": {
     "bp:add": "git remote add bp https://github.com/waitingsong/npm-base",
-    "bp:sync": "git fetch bp && git pull --no-edit bp master",
+    "bp:sync": "git fetch bp && git pull --no-edit bp amd",
     "build": "npm run clean && npm run lint && npm run lint:t && npm run tsc && npm run jslint",
     "clean": "rm -rf dist/*",
     "cov": "nyc mocha",
@@ -79,3 +79,4 @@
     "tsc:w": "tsc -p tsconfig.json -w"
   }
 }
+

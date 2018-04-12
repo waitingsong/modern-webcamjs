@@ -7,7 +7,7 @@
     "emitDecoratorMetadata": true,
     "importHelpers": false,
     "inlineSourceMap": false,
-    "module": "commonjs",
+    "module": "amd",
     "newLine": "lf",
     "noFallthroughCasesInSwitch": true,
     "outDir": "./dist", 
@@ -17,8 +17,7 @@
     "strict": true, 
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "target": "ES2017",
-    "types" : ["node"]
+    "target": "ES2017"
   },
   "include": [
     "src/**/*"
