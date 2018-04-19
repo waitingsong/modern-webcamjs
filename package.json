@@ -8,7 +8,7 @@
     "build:ts": "tsc -p ./ --outDir dist/",
     "clean": "rm -rf dist/*",
     "jslint": "eslint --fix dist/**/*.js",
-    "lint": "tslint -p tslint.json ",
+    "lint": "tslint -p tsconfig.json",
     "prepublishOnly": "npm run build",
     "test": "npm run lint",
     "tsc:w": "tsc -p ./tsconfig.json -w"
