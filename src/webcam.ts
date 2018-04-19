@@ -649,6 +649,10 @@ init.fn.prepare_snap_opts = function(opts): SnapParams {
         sopts.snapDelay = cam.config.snapDelay;
     }
 
+    if (typeof sopts.rotation === 'undefined') {
+      sopts.rotation = 1;
+    }
+
     sopts.streamIdx = sidx;
     return sopts;
 };
@@ -857,6 +861,35 @@ function attach_stream(inst: Inst, sidx: StreamIdx, stream: void | MediaStream):
     });
 }
 
+function drawRotated(cvs: HTMLCanvasElement, image: HTMLCanvasElement | HTMLImageElement, degrees: number): void {
+    const ctx = cvs.getContext('2d');
+
+    if (!ctx) {
+        throw new Error('canvas context invalud');
+    }
+
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+    // save the unrotated context of the canvas so we can restore it later
+    // the alternative is to untranslate & unrotate after drawing
+    ctx.save();
+
+    // move to the center of the canvas
+    ctx.translate(cvs.width / 2, cvs.height / 2);
+
+    // rotate the canvas to the specified degrees
+    ctx.rotate(degrees * Math.PI / 180);
+
+    // draw the image
+    // since the context is rotated, the image will be rotated also
+    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+
+    // we’re done with the rotating so restore the unrotated context
+    ctx.restore();
+}
+
+
+// return ObjectURL or DataURL
 function snap(inst: Inst, sopts: SnapParams): Promise<string> {
     const cvs: HTMLCanvasElement = document.createElement('canvas');
 
@@ -865,8 +898,7 @@ function snap(inst: Inst, sopts: SnapParams): Promise<string> {
     const ctx = cvs.getContext('2d');
 
     if ( ! ctx) {
-        console.error('ctx empty');
-        return Promise.resolve('');
+        return Promise.reject('canvas-unsupported');
     }
 
     // flip canvas horizontally if desired
@@ -877,37 +909,64 @@ function snap(inst: Inst, sopts: SnapParams): Promise<string> {
     const video = inst.video;
 
     if (video) {
+        const cvs2: HTMLCanvasElement = document.createElement('canvas');
+        const rotation = +sopts.rotation;
+        let w = cvs.width;
+        let h = cvs.height;
+        let angular = 0;
+
+        switch (rotation) {
+            case 8: // turn left 90
+                w = cvs.height;
+                h = cvs.width;
+                angular = -90;
+                break;
+            case 3: // turn right 180
+                w = cvs.width;
+                h = cvs.height;
+                angular = 180;
+                break;
+            case 6: // turn right 90
+                w = cvs.height;
+                h = cvs.width;
+                angular = 90;
+                break;
+            case 1:
+                w = cvs.width;
+                h = cvs.height;
+                break;
+            default:
+                w = cvs.width;
+                h = cvs.height;
+                break;
+        }
+        cvs2.width = w;
+        cvs2.height = h;
+
         ctx.drawImage(video, 0, 0, sopts.width, sopts.height);
+        drawRotated(cvs2, cvs, angular);    // rotate image
+        cvs.width = cvs.height = 0;
 
         return new Promise<string>((resolve, reject) => {
             switch (sopts.dataType)  {
                 case 'dataURL':
                 case 'dataurl':
-                    return resolve(cvs.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100));
+                    return resolve(cvs2.toDataURL('image/' + sopts.imageFormat, sopts.jpegQuality / 100));
 
                 case 'objectURL':
                 case 'objecturl':
-                    return cvs.toBlob((blob) => {
+                    return cvs2.toBlob((blob) => {
                         // need call URL.revokeObjectURL(ourl) later
                         resolve(blob ? URL.createObjectURL(blob) : '');
                     }, 'image/' + sopts.imageFormat, sopts.jpegQuality / 100);
 
                 default:
-                    assert_never(sopts.dataType);
-                    return resolve('');
+                    return assert_never(sopts.dataType);
             }
-        })
-            .then(url => {
-                return url ? url : '';
-            })
-            .catch(err => {
-                console.error(err);
-                return '';
-            });
+        });
     }
     else {
-        console.error('video empty');
-        return Promise.resolve('');
+        return Promise.reject('video empty');
     }
 }
 
@@ -1003,6 +1062,7 @@ export interface SnapParams {
     dataType: ImgDataType;
     switchDelay: number;
     snapDelay: number;
+    rotation: 8 | 3 | 6 | 1; // default 1
 }
 
 export interface VideoConstraints {
